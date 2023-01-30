@@ -1,7 +1,6 @@
 const config = require('./config.json');
-
+const token_config = require('./BOT_TOKEN.json');
 const { Client, GatewayIntentBits } = require('discord.js');
-
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -33,4 +32,4 @@ client.on('message', async message => {
 		}
 	}
 );
-client.login(process.env.TOKEN);
+client.login(token_config.TOKEN);
