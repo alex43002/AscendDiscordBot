@@ -1,8 +1,9 @@
-require('./commands/ping.js');
-const config = require('./config.json');
+const fs = require('node:fs');
+const path = require('node:path');
 const token_config = require('./BOT_TOKEN.json');
-const { Client, GatewayIntentBits } = require('discord.js');
-const client = new Client({
+//const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+/*const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
@@ -10,27 +11,39 @@ const client = new Client({
 		GatewayIntentBits.GuildMembers,
 	],
 });
+*/
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.once('ready', () => {
-	console.log(`Ready`);
+
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
+}
+
+client.once(Events.ClientReady, () => {
+	console.log('Ready!');
 });
 
-client.on('message', async message => {
-	// Turns the bot on
-	
-	if (message.author.bot) 
-        return; 
-	// The bot will ignore messages from other bots
-	
-	if (!message.content.startsWith(config.prefix)) 
-        return;
-	// Ignores messages that don't start with the prefix
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isChatInputCommand()) return;
 
-	if (message.content == `${config.prefix}ping`) {
-	// Read for the ping command
-		message.channel.send(`Pong!`);
-		// Send 'pong' into the channel if the ping command is heard
-		}
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
-);
+});
+
+
+
 client.login(token_config.TOKEN);
