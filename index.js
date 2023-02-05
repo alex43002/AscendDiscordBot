@@ -1,3 +1,4 @@
+require('./commands/ping.js');
 const config = require('./config.json');
 const token_config = require('./BOT_TOKEN.json');
 const { Client, GatewayIntentBits } = require('discord.js');
