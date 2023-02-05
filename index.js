@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const token_config = require('./BOT_TOKEN.json');
+require('./application-commands.js');
 //const { Client, GatewayIntentBits } = require('discord.js');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 /*const client = new Client({
